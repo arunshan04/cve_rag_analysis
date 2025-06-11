@@ -1,0 +1,18 @@
+export ELASTIC_ENDPOINT="https://elastic-observability.es.ap-southeast-1.aws.found.io"
+export ELASTIC_API_KEY="MHVnSVg1Y0JiN3JESEE4VzE5anE6RzFUZGVxd2ZiWjZtanZrR2FqbU05QQ=="
+export AZURE_OPENAI_API_KEY="2PF2QjRGXdSg2Aas83oLV9P6SIlqZWABKrQ06X7Px5K7AW7LQFOBJQQJ99BEACHYHv6XJ3w3AAAAACOGdxrJ"
+export AZURE_OPENAI_REGION="eastus2"
+export AZURE_OPENAI_ENDPOINT="https://aruns-masaizoe-eastus2.cognitiveservices.azure.com/"
+
+
+
+    PUT _inference/completion/azure_openai_gpt4omini_completion
+    {
+        "service": "azureopenai",
+        "service_settings": {
+            "api_key": "2PF2QjRGXdSg2Aas83oLV9P6SIlqZWABKrQ06X7Px5K7AW7LQFOBJQQJ99BEACHYHv6XJ3w3AAAAACOGdxrJ",
+            "resource_name": "eastus2",
+            "deployment_id": "gpt-4o-mini",
+            "api_version": "2023-06-01-preview"
+        }
+    }

@@ -1,0 +1,28 @@
+{
+  "processors": [
+    {
+      "script": {
+        "source": "ctx.prompt = 'Extract any structured information about individual or institutional shareholders and their shareholdings, including executives or directors. Include all relevant details and tables. If no such structured shareholding information is found, strictly return NONE.Here is the Context: ' + ctx.body;"
+      }
+    },
+    {
+      "inference": {
+        "model_id": "azure_openai_gpt4omini_completion",
+        "input_output": {
+          "input_field": "prompt",
+          "output_field": "shareholders"
+        }
+      }
+    },
+    {
+      "drop": {
+        "if": "ctx.shareholders == 'NONE'"
+      }
+    },
+    {
+      "remove": {
+        "field": ["prompt", "body"]
+      }
+    }
+  ]
+}
