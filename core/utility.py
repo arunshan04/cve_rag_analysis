@@ -367,4 +367,37 @@ def getIndexStructure():
         return es_client.indices.get_mapping(index=elastic_index_name)
     except Exception as e:
         print(f"Error fetching mapping: {e}")
+
+
+def search_by_cve_ids(cve_id_list):
+    """
+    Search Elasticsearch for documents where the CVE ID field matches any of the CVE IDs in the list.
+
+    :param es_client: Elasticsearch client instance
+    :param index_name: Name of the index to search
+    :param cve_id_list: List of CVE IDs (e.g., ['CVE-2024-09876', 'CVE-2023-123'])
+    :param cve_field: Field name in the index that contains the CVE ID (default: 'cve_id')
+    :return: List of matching documents
+    """
+    es_client=getOrCreate_es_client()
+    if not cve_id_list:
+        return []
+
+    query = {
+    "query": {
+        "terms": {
+            "metadata.id": cve_id_list
+                }
+            },
+    "_source": [
+        "metadata.title",
+        "text",
+        "metadata.published_date",
+        "metadata.severity",
+        "metadata.affected_packages"
+                ],
+        }
+
+    response = es_client.search(index=elastic_index_name, body=query)
+    return response["hits"]["hits"]
     

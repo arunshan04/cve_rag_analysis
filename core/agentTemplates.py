@@ -8,6 +8,19 @@ from .promptTemplates import *
 from langchain_core.runnables import RunnableLambda
 from typing import TypedDict
 from langgraph.graph import StateGraph, END
+import re
+from elasticsearch import Elasticsearch
+
+
+
+### Elasticsearch Configuration
+from elasticsearch import Elasticsearch
+
+client = Elasticsearch(
+    "https://f0c40d3bde77471f83e6cace87537665.ap-southeast-1.aws.found.io",
+    # api_key="Mk9odVlwY0JiN3JESEE4VzhkZ286WTNuZ29WR2pYMDF6em1DV193WVdkZw=="
+    api_key="MnVpVVlwY0JiN3JESEE4V2FOaEk6X2NRRS1ESnM2V1A2TDJKQ25pb01NUQ=="
+)
 
 # llm = AzureChatOpenAI(azure_deployment=azure_openai_model_id, api_version=azure_openai_api_version,temperature=azure_openai_temperature)
 llm = ChatOllama(model="llama3.2")
@@ -43,7 +56,29 @@ def create_processflow_graph():
 
     return workflow.compile()
 
+
+def extract_cves(text):
+    """
+    Extract all CVE identifiers from a string.
+    Example formats: CVE-2024-1234, CVE-2025-00001, etc.
+    """
+    cve_pattern = r'CVE-\d{4}-\d+'  # CVE-YYYY-NNNN to NNNNNNN
+    return re.findall(cve_pattern, text.upper(), flags=re.IGNORECASE)
+
 def processflow_graph_invoke(question):
+    cves=extract_cves(question)
+    if cves:
+        print(f"Extracted CVEs: {cves}")
+        question = f"Please provide details for the following CVEs: {', '.join(cves)}"
+        cveDetails=search_by_cve_ids(cves)
+        if cveDetails:
+            print(f"CVE Details: {cveDetails}")
+            question += f"\n\nCVE Details:\n{cveDetails}"
+        else:
+            print("No details found for the extracted CVEs.")
+            question += "\n\nNo details found for the extracted CVEs."
+    else:
+        print("No CVEs found in the question.")
     processflow_graph = create_processflow_graph()
     print('Inside........ processflow_graph_invoke')
     return processflow_graph.invoke({"input": question})
